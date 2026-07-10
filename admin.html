@@ -1,0 +1,656 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ToyBoom Admin</title>
+<link href="https://fonts.googleapis.com/css2?family=Fredoka+One&family=Nunito:wght@400;600;700;800;900&display=swap" rel="stylesheet">
+<style>
+:root{--y:#FFD700;--o:#FF8C00;--o2:#FF6B00;--b:#00AAFF;--b2:#0077DD;--dk:#1a1a2e;--r:#FF4444;--g:#44DD88;}
+*{margin:0;padding:0;box-sizing:border-box;}
+body{font-family:'Nunito',sans-serif;background:#0d0d1a;color:white;direction:rtl;min-height:100vh;}
+::-webkit-scrollbar{width:5px}::-webkit-scrollbar-thumb{background:var(--y);border-radius:3px}
+#loginScreen{display:flex;align-items:center;justify-content:center;min-height:100vh;padding:20px;}
+.login-card{background:#1a1a2e;border:2px solid rgba(255,215,0,.2);border-radius:24px;padding:40px;width:100%;max-width:380px;text-align:center;}
+.login-logo{font-family:'Fredoka One',cursive;font-size:2.5rem;margin-bottom:6px;}
+.login-logo .t{color:var(--b);}.login-logo .b{color:var(--y);}
+.login-sub{color:rgba(255,255,255,.4);font-size:.8rem;font-weight:700;margin-bottom:30px;}
+.login-input{width:100%;background:rgba(255,255,255,.07);border:1.5px solid rgba(255,255,255,.15);border-radius:12px;padding:13px 16px;color:white;font-family:'Nunito',sans-serif;font-size:1rem;font-weight:600;outline:none;margin-bottom:14px;text-align:center;letter-spacing:3px;}
+.login-input:focus{border-color:var(--y);}
+.login-input::placeholder{letter-spacing:0;color:rgba(255,255,255,.3);}
+.btn-login{width:100%;background:linear-gradient(135deg,var(--y),var(--o));color:#1a1a2e;border:none;padding:14px;border-radius:50px;font-family:'Fredoka One',cursive;font-size:1.2rem;cursor:pointer;transition:all .2s;}
+.btn-login:hover{transform:translateY(-2px);box-shadow:0 8px 24px rgba(255,165,0,.4);}
+.login-err{color:var(--r);font-size:.85rem;font-weight:700;margin-top:10px;display:none;}
+#adminApp{display:none;}
+header{background:linear-gradient(135deg,#1a1a2e,#16213e);padding:14px 22px;display:flex;align-items:center;justify-content:space-between;border-bottom:2px solid rgba(255,215,0,.2);position:sticky;top:0;z-index:50;}
+.h-logo{font-family:'Fredoka One',cursive;font-size:1.35rem;}
+.h-logo .t{color:var(--b);}.h-logo .b{color:var(--y);}
+.h-sub{color:rgba(255,255,255,.35);font-size:.68rem;font-weight:700;}
+.h-status{background:rgba(68,221,136,.12);border:1px solid var(--g);border-radius:8px;padding:5px 11px;color:var(--g);font-size:.75rem;font-weight:800;}
+.btn-logout{background:rgba(255,68,68,.1);border:1px solid rgba(255,68,68,.3);color:rgba(255,68,68,.8);border-radius:8px;padding:6px 14px;cursor:pointer;font-family:'Nunito',sans-serif;font-weight:700;font-size:.8rem;transition:all .2s;}
+.btn-logout:hover{background:rgba(255,68,68,.2);}
+.tabs{display:flex;gap:4px;padding:14px 22px 0;border-bottom:1px solid rgba(255,255,255,.08);background:#0d0d1a;}
+.tab{background:transparent;border:none;border-bottom:3px solid transparent;color:rgba(255,255,255,.45);padding:10px 18px;cursor:pointer;font-family:'Nunito',sans-serif;font-weight:800;font-size:.88rem;display:flex;align-items:center;gap:6px;transition:all .2s;}
+.tab.active{color:var(--y);border-bottom-color:var(--y);background:rgba(255,215,0,.06);}
+.main{padding:22px;max-width:860px;margin:0 auto;}
+.stats{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-bottom:20px;}
+.stat{background:rgba(255,255,255,.04);border-radius:14px;padding:13px 15px;display:flex;align-items:center;gap:12px;}
+.stat-icon{font-size:1.7rem;}
+.stat-val{font-family:'Fredoka One',cursive;font-size:1.5rem;line-height:1;}
+.stat-lbl{color:rgba(255,255,255,.4);font-size:.72rem;font-weight:700;}
+.toolbar{display:flex;gap:10px;margin-bottom:16px;}
+.search-inp{flex:1;background:rgba(255,255,255,.07);border:1.5px solid rgba(255,255,255,.12);border-radius:10px;padding:10px 14px;color:white;font-family:'Nunito',sans-serif;font-size:.9rem;font-weight:600;outline:none;}
+.search-inp:focus{border-color:var(--y);}
+.search-inp::placeholder{color:rgba(255,255,255,.3);}
+.prow{display:flex;align-items:center;gap:14px;padding:14px 16px;background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.07);border-radius:14px;margin-bottom:10px;transition:background .2s;}
+.prow:hover{background:rgba(255,255,255,.07);}
+.prow.off{opacity:.4;}
+.pthumb{width:64px;height:64px;border-radius:12px;object-fit:cover;border:2px solid rgba(255,255,255,.1);flex-shrink:0;background:#222;display:flex;align-items:center;justify-content:center;font-size:1.8rem;}
+.pthumb img{width:64px;height:64px;border-radius:12px;object-fit:cover;}
+.pinfo{flex:1;min-width:0;}
+.pname{color:white;font-weight:800;font-size:.93rem;margin-bottom:4px;}
+.pdesc{color:rgba(255,255,255,.38);font-size:.77rem;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;margin-bottom:5px;}
+.pmeta{display:flex;gap:12px;align-items:center;}
+.pprice{color:var(--y);font-family:'Fredoka One',cursive;font-size:1.05rem;}
+.page{color:rgba(255,255,255,.3);font-size:.73rem;}
+.pstars{color:var(--y);font-size:.73rem;}
+.badge-p{display:inline-block;padding:3px 9px;border-radius:20px;font-size:.7rem;font-weight:800;color:white;}
+.pactions{display:flex;flex-direction:column;gap:6px;flex-shrink:0;}
+.btn{border:none;border-radius:10px;padding:7px 14px;font-family:'Nunito',sans-serif;font-weight:800;cursor:pointer;transition:all .2s;font-size:.8rem;display:inline-flex;align-items:center;gap:5px;}
+.btn:hover:not(:disabled){transform:translateY(-1px);}
+.btn-y{background:linear-gradient(135deg,var(--y),var(--o));color:#1a1a2e;}
+.btn-b{background:linear-gradient(135deg,var(--b),var(--b2));color:white;}
+.btn-r{background:linear-gradient(135deg,var(--r),#cc0000);color:white;}
+.btn-g2{background:rgba(255,255,255,.08);color:rgba(255,255,255,.7);border:1.5px solid rgba(255,255,255,.15);}
+.btn-lg{padding:11px 22px;font-size:.92rem;border-radius:50px;}
+.btn-green{background:linear-gradient(135deg,#44DD88,#00AA55);color:white;}
+.btn-orange{background:linear-gradient(135deg,#FF8C00,#cc6600);color:white;}
+.empty{text-align:center;padding:50px;color:rgba(255,255,255,.25);font-weight:700;}
+.empty span{font-size:3rem;display:block;margin-bottom:10px;}
+.order-card{background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.08);border-radius:14px;padding:16px 18px;margin-bottom:12px;transition:all .3s;}
+.order-card.confirmed{border-color:rgba(255,140,0,.45);background:rgba(255,140,0,.05);}
+.order-top{display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;}
+.order-id{font-family:'Fredoka One',cursive;color:var(--y);font-size:1.05rem;}
+.order-date{color:rgba(255,255,255,.35);font-size:.75rem;}
+.order-product{font-weight:800;font-size:.92rem;color:white;margin-bottom:4px;}
+.order-total{color:var(--g);font-family:'Fredoka One',cursive;font-size:1.1rem;}
+.order-info{color:rgba(255,255,255,.5);font-size:.8rem;line-height:1.8;}
+.order-addr{background:rgba(255,255,255,.04);border-radius:10px;padding:10px 13px;margin-top:10px;font-size:.8rem;color:rgba(255,255,255,.55);line-height:1.9;}
+.order-status{display:inline-block;padding:4px 12px;border-radius:20px;font-size:.75rem;font-weight:800;}
+.status-new{background:rgba(0,170,255,.15);color:var(--b);border:1px solid rgba(0,170,255,.3);}
+.status-confirmed{background:rgba(255,140,0,.15);color:#FF8C00;border:1px solid rgba(255,140,0,.4);}
+.order-actions{display:flex;gap:8px;margin-top:12px;}
+.order-actions .btn{flex:1;justify-content:center;padding:10px 8px;font-size:.83rem;}
+.overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.88);z-index:200;align-items:center;justify-content:center;backdrop-filter:blur(8px);padding:14px;}
+.overlay.open{display:flex;}
+.modal{background:#1a1a2e;border:2px solid rgba(255,215,0,.2);border-radius:22px;padding:24px;width:100%;max-width:520px;max-height:92vh;overflow-y:auto;direction:rtl;}
+.modal-title{font-family:'Fredoka One',cursive;color:var(--y);font-size:1.2rem;margin-bottom:18px;}
+.inp{width:100%;background:rgba(255,255,255,.07);border:1.5px solid rgba(255,255,255,.12);border-radius:10px;padding:10px 13px;color:white;font-family:'Nunito',sans-serif;font-size:.9rem;font-weight:600;outline:none;transition:border-color .2s;}
+.inp:focus{border-color:var(--y);}
+.inp::placeholder{color:rgba(255,255,255,.3);}
+.inp option{background:#1a1a2e;}
+.lbl{color:rgba(255,255,255,.65);font-size:.78rem;font-weight:700;margin-bottom:5px;display:block;}
+.fg{margin-bottom:14px;}
+.r2{display:grid;grid-template-columns:1fr 1fr;gap:12px;}
+.img-drop{border:2px dashed rgba(255,255,255,.2);border-radius:14px;cursor:pointer;background:rgba(255,255,255,.03);overflow:hidden;min-height:140px;display:flex;align-items:center;justify-content:center;flex-direction:column;gap:8px;transition:all .2s;}
+.img-drop:hover,.img-drop.drag{border-color:var(--y);background:rgba(255,215,0,.05);}
+.img-drop img{width:100%;max-height:190px;object-fit:cover;display:block;}
+.img-drop-text{color:rgba(255,255,255,.45);font-weight:700;font-size:.83rem;}
+.star-pick-row{display:flex;gap:6px;direction:ltr;justify-content:flex-end;}
+.sp{font-size:1.8rem;cursor:pointer;color:rgba(255,255,255,.2);background:none;border:none;padding:0;transition:all .15s;}
+.sp.on{color:var(--y);}
+.badge-opts{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:8px;}
+.badge-opt{padding:5px 13px;border-radius:20px;cursor:pointer;font-size:.8rem;font-weight:700;font-family:'Nunito',sans-serif;border:1.5px solid rgba(255,255,255,.12);background:rgba(255,255,255,.07);color:white;transition:all .2s;}
+.toggle-wrap{display:flex;align-items:center;gap:12px;}
+.toggle{width:44px;height:24px;border-radius:12px;cursor:pointer;position:relative;transition:background .2s;flex-shrink:0;}
+.toggle-thumb{position:absolute;top:3px;width:18px;height:18px;border-radius:50%;background:white;transition:right .25s;}
+.confirm-box{background:#1a1a2e;border-radius:22px;padding:28px;max-width:310px;width:90%;text-align:center;}
+.confirm-box.danger{border:2px solid rgba(255,68,68,.4);}
+.confirm-box.success{border:2px solid rgba(68,221,136,.4);}
+.toast{position:fixed;bottom:22px;left:50%;transform:translateX(-50%);padding:10px 22px;border-radius:50px;font-weight:800;font-size:.88rem;box-shadow:0 6px 24px rgba(0,0,0,.4);z-index:300;white-space:nowrap;animation:fadeUp .25s ease;display:none;}
+.toast.show{display:block;}
+@keyframes fadeUp{from{opacity:0;transform:translate(-50%,14px)}to{opacity:1;transform:translate(-50%,0)}}
+@media(max-width:600px){.stats{grid-template-columns:1fr 1fr;}.r2{grid-template-columns:1fr;}.pactions{flex-direction:row;}.prow{flex-wrap:wrap;}.order-actions .btn{font-size:.75rem;padding:9px 6px;}}
+</style>
+</head>
+<body>
+
+<div id="loginScreen">
+  <div class="login-card">
+    <div class="login-logo"><span class="t">Toy</span><span class="b">Boom</span></div>
+    <div class="login-sub">لوحة تحكم المتجر</div>
+    <input type="password" class="login-input" id="passInput" placeholder="كلمة السر" onkeydown="if(event.key==='Enter')doLogin()">
+    <button class="btn-login" onclick="doLogin()">🔐 دخول</button>
+    <div class="login-err" id="loginErr">❌ كلمة السر غلط</div>
+  </div>
+</div>
+
+<div id="adminApp">
+  <header>
+    <div>
+      <div class="h-logo"><span class="t">Toy</span><span class="b">Boom</span> <span style="color:rgba(255,255,255,.35);font-size:.8rem;">| Admin</span></div>
+      <div class="h-sub"></div>
+    </div>
+    <div style="display:flex;gap:10px;align-items:center;">
+      <div class="h-status" id="prodCount">🟢 0 منتج</div>
+      <button class="btn-logout" onclick="changePassword()" style="color:rgba(255,215,0,.8);border-color:rgba(255,215,0,.3);background:rgba(255,215,0,.08);">🔑 تغيير السر</button>
+      <button class="btn-logout" onclick="logout()">خروج</button>
+    </div>
+  </header>
+
+  <div class="tabs">
+    <button class="tab active" onclick="switchTab('products',this)">🧸 المنتجات</button>
+    <button class="tab" onclick="switchTab('orders',this)">📦 الطلبات</button>
+    <button class="tab" onclick="switchTab('reviews',this)">💬 التقييمات</button>
+  </div>
+
+  <div class="main" id="tab-products">
+    <div class="stats" id="statsRow"></div>
+    <div class="toolbar">
+      <input class="search-inp" placeholder="🔍 ابحث في المنتجات..." oninput="filterProducts(this.value)">
+      <button class="btn btn-y btn-lg" onclick="openAddModal()">+ إضافة منتج</button>
+    </div>
+    <div id="productsList"></div>
+  </div>
+
+  <div class="main" id="tab-orders" style="display:none;">
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:20px;">
+      <div>
+        <div style="font-family:'Fredoka One',cursive;font-size:1.4rem;color:white;">📦 الطلبات الواردة</div>
+        <div style="color:rgba(255,255,255,.4);font-size:.8rem;" id="ordersCount">جارٍ التحميل...</div>
+      </div>
+      <button class="btn btn-g2" onclick="loadOrders()">🔄 تحديث</button>
+    </div>
+    <div id="ordersList"></div>
+  </div>
+
+  <div class="main" id="tab-reviews" style="display:none;">
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:20px;">
+      <div style="font-family:'Fredoka One',cursive;font-size:1.4rem;color:white;">💬 تقييمات العملاء</div>
+      <button class="btn btn-g2" onclick="loadReviews()">🔄 تحديث</button>
+    </div>
+    <div id="reviewsList2"></div>
+  </div>
+</div>
+
+<!-- PRODUCT MODAL -->
+<div class="overlay" id="productModal">
+  <div class="modal">
+    <div class="modal-title" id="modalTitle">➕ إضافة منتج جديد</div>
+    <div class="fg">
+      <label class="lbl">📸 صورة المنتج</label>
+      <div class="img-drop" id="imgDrop" onclick="document.getElementById('imgFile').click()"
+        ondragover="event.preventDefault();this.classList.add('drag')"
+        ondragleave="this.classList.remove('drag')"
+        ondrop="handleImgDrop(event)">
+        <span style="font-size:2.3rem;">📸</span>
+        <span class="img-drop-text">اسحب صورة هنا أو اضغط للرفع</span>
+        <span style="color:rgba(255,255,255,.25);font-size:.72rem;">PNG • JPG • WEBP</span>
+      </div>
+      <input type="file" id="imgFile" accept="image/*" style="display:none" onchange="handleImgFile(this.files[0])">
+      <button id="removeImgBtn" style="display:none;background:none;border:none;color:rgba(255,68,68,.8);cursor:pointer;font-size:.78rem;font-weight:700;font-family:'Nunito',sans-serif;margin-top:6px;" onclick="removeImg()">🗑️ إزالة الصورة</button>
+    </div>
+    <div class="fg"><label class="lbl">🏷️ اسم المنتج *</label><input class="inp" id="mName" placeholder="مثال: دبدوب ناعم للأطفال"></div>
+    <div class="fg"><label class="lbl">📝 وصف المنتج</label><textarea class="inp" id="mDesc" rows="3" style="resize:vertical" placeholder="وصف جذاب..."></textarea></div>
+    <div class="r2">
+      <div class="fg"><label class="lbl">💰 السعر (جنيه) *</label><input class="inp" type="number" id="mPrice" placeholder="99"></div>
+      <div class="fg"><label class="lbl">🏷️ سعر قبل الخصم</label><input class="inp" type="number" id="mOldPrice" placeholder="149"></div>
+    </div>
+    <div class="fg"><label class="lbl">👶 الفئة العمرية</label><input class="inp" id="mAge" placeholder="3+ سنوات"></div>
+    <div class="fg">
+      <label class="lbl">⭐ التقييم</label>
+      <div class="star-pick-row" id="starRow">
+        <button class="sp" data-v="5" onclick="pickStar(5)">★</button>
+        <button class="sp" data-v="4" onclick="pickStar(4)">★</button>
+        <button class="sp" data-v="3" onclick="pickStar(3)">★</button>
+        <button class="sp" data-v="2" onclick="pickStar(2)">★</button>
+        <button class="sp" data-v="1" onclick="pickStar(1)">★</button>
+      </div>
+    </div>
+    <div class="fg">
+      <label class="lbl">🏷️ البادج</label>
+      <div class="badge-opts" id="badgeOpts">
+        <button class="badge-opt" data-v="hot"      onclick="pickBadge(this)" style="background:#FF4444;border-color:#FF4444;">🔥 رائج</button>
+        <button class="badge-opt" data-v="new"      onclick="pickBadge(this)" style="background:#44DD88;border-color:#44DD88;">✨ جديد</button>
+        <button class="badge-opt" data-v="sale"     onclick="pickBadge(this)" style="background:#FF6B00;border-color:#FF6B00;">💛 خصم</button>
+        <button class="badge-opt" data-v="preorder" onclick="pickBadge(this)" style="background:#00AAFF;border-color:#00AAFF;">🔔 حجز مسبق</button>
+        <button class="badge-opt" data-v="none"     onclick="pickBadge(this)">بدون بادج</button>
+      </div>
+      <input class="inp" id="mBadgeText" placeholder="نص البادج" style="margin-top:8px;">
+    </div>
+    <div class="fg">
+      <label class="lbl">📦 متاح للبيع</label>
+      <div class="toggle-wrap">
+        <div class="toggle" id="availToggle" onclick="toggleAvailModal()" style="background:var(--g);">
+          <div class="toggle-thumb" id="availThumb" style="right:3px;"></div>
+        </div>
+        <span id="availLabel" style="color:var(--g);font-size:.82rem;font-weight:700;">متاح</span>
+      </div>
+    </div>
+    <div style="display:flex;gap:10px;">
+      <button class="btn btn-g2" style="flex:1;" onclick="closeModal('productModal')">إلغاء</button>
+      <button class="btn btn-y" style="flex:2;padding:11px;" onclick="saveProduct()">💾 حفظ المنتج</button>
+    </div>
+  </div>
+</div>
+
+<!-- DELETE CONFIRM -->
+<div class="overlay" id="deleteModal">
+  <div class="confirm-box danger">
+    <div style="font-size:2.8rem;margin-bottom:12px;">🗑️</div>
+    <div style="font-family:'Fredoka One',cursive;font-size:1.2rem;margin-bottom:8px;">تأكيد الحذف؟</div>
+    <div style="color:rgba(255,255,255,.45);font-size:.83rem;margin-bottom:22px;">المنتج هيتحذف من Firebase فوراً</div>
+    <div style="display:flex;gap:10px;">
+      <button class="btn btn-g2" style="flex:1;" onclick="closeModal('deleteModal')">إلغاء</button>
+      <button class="btn btn-r" style="flex:1;" id="confirmDeleteBtn">احذف</button>
+    </div>
+  </div>
+</div>
+
+<!-- DELIVER CONFIRM -->
+<div class="overlay" id="deliverModal">
+  <div class="confirm-box success">
+    <div style="font-size:2.8rem;margin-bottom:12px;">🚚</div>
+    <div style="font-family:'Fredoka One',cursive;font-size:1.2rem;margin-bottom:8px;">تأكيد تسليم الطلب؟</div>
+    <div style="color:rgba(255,255,255,.45);font-size:.83rem;margin-bottom:22px;">الطلب هيتحذف من القائمة نهائياً</div>
+    <div style="display:flex;gap:10px;">
+      <button class="btn btn-g2" style="flex:1;" onclick="closeModal('deliverModal')">إلغاء</button>
+      <button class="btn btn-green" style="flex:1;" id="confirmDeliverBtn">✅ تم التسليم</button>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+const FIREBASE = "https://toyboom-default-rtdb.europe-west1.firebasedatabase.app";
+const BADGE_COLORS = { hot:"#FF4444", new:"#44DD88", sale:"#FF6B00", preorder:"#00AAFF", none:"transparent" };
+
+// ── LOGIN ──
+async function doLogin() {
+  const pass = document.getElementById('passInput').value.trim();
+  if (!pass) return;
+  const btn = document.querySelector('.btn-login');
+  btn.textContent = '⏳ جارٍ التحقق...'; btn.disabled = true;
+  try {
+    const encoder = new TextEncoder();
+    const hashBuf = await crypto.subtle.digest('SHA-256', encoder.encode(pass));
+    const hash = Array.from(new Uint8Array(hashBuf)).map(b=>b.toString(16).padStart(2,'0')).join('');
+    const r = await fetch(`${FIREBASE}/admin_config/pass_hash.json`);
+    const saved = await r.json();
+    if (!saved) {
+      await fetch(`${FIREBASE}/admin_config/pass_hash.json`,{method:'PUT',headers:{'Content-Type':'application/json'},body:JSON.stringify(hash)});
+      grantAccess();
+    } else if (hash === saved) { grantAccess(); }
+    else {
+      document.getElementById('loginErr').style.display='block';
+      setTimeout(()=>document.getElementById('loginErr').style.display='none',2500);
+    }
+  } catch(e) {
+    document.getElementById('loginErr').textContent='❌ خطأ في الاتصال بـ Firebase';
+    document.getElementById('loginErr').style.display='block';
+  }
+  btn.textContent='🔐 دخول'; btn.disabled=false;
+}
+
+function grantAccess() {
+  sessionStorage.setItem('tb_admin','1');
+  document.getElementById('loginScreen').style.display='none';
+  document.getElementById('adminApp').style.display='block';
+  init();
+}
+
+function logout() { sessionStorage.removeItem('tb_admin'); location.reload(); }
+
+async function changePassword() {
+  const newPass = prompt('كلمة السر الجديدة:');
+  if (!newPass || newPass.length < 6) { alert('⚠️ كلمة السر لازم تكون 6 أحرف على الأقل'); return; }
+  const encoder = new TextEncoder();
+  const hashBuf = await crypto.subtle.digest('SHA-256', encoder.encode(newPass));
+  const hash = Array.from(new Uint8Array(hashBuf)).map(b=>b.toString(16).padStart(2,'0')).join('');
+  await fetch(`${FIREBASE}/admin_config/pass_hash.json`,{method:'PUT',headers:{'Content-Type':'application/json'},body:JSON.stringify(hash)});
+  showToast('✅ تم تغيير كلمة السر!');
+}
+
+if (sessionStorage.getItem('tb_admin')) {
+  document.getElementById('loginScreen').style.display='none';
+  document.getElementById('adminApp').style.display='block';
+}
+
+// ── FIREBASE ──
+async function fbGet(path) {
+  const r = await fetch(`${FIREBASE}/${path}.json`);
+  const d = await r.json();
+  if (!d) return [];
+  return Object.entries(d).map(([k,v])=>({...v,_key:k}));
+}
+async function fbPush(path,data) {
+  const r = await fetch(`${FIREBASE}/${path}.json`,{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify(data)});
+  return await r.json();
+}
+async function fbUpdate(path,data) {
+  await fetch(`${FIREBASE}/${path}.json`,{method:"PATCH",headers:{"Content-Type":"application/json"},body:JSON.stringify(data)});
+}
+async function fbDelete(path) {
+  await fetch(`${FIREBASE}/${path}.json`,{method:"DELETE"});
+}
+
+// ── TABS ──
+function switchTab(name,btn) {
+  ['products','orders','reviews'].forEach(t=>document.getElementById('tab-'+t).style.display=t===name?'block':'none');
+  document.querySelectorAll('.tab').forEach(t=>t.classList.remove('active'));
+  btn.classList.add('active');
+  if(name==='orders') loadOrders();
+  if(name==='reviews') loadReviews();
+}
+
+// ── STATE ──
+let allProducts=[],editingKey=null,modalImg="",modalStars=5,modalBadge="new",modalAvail=true;
+
+async function init() { await loadProducts(); }
+
+// ── PRODUCTS ──
+async function loadProducts() {
+  try {
+    allProducts = await fbGet("products");
+    renderProducts(allProducts); updateStats();
+  } catch(e) { showToast("❌ فشل تحميل المنتجات — تأكد من Firebase Rules","err"); }
+}
+
+function updateStats() {
+  const avail=allProducts.filter(p=>p.available!==false).length;
+  const off=allProducts.filter(p=>p.available===false).length;
+  document.getElementById('prodCount').textContent=`🟢 ${avail} متاح`;
+  document.getElementById('statsRow').innerHTML=`
+    <div class="stat" style="border:1px solid #00AAFF33;"><span class="stat-icon">🧸</span><div><div class="stat-val" style="color:#00AAFF;">${allProducts.length}</div><div class="stat-lbl">إجمالي المنتجات</div></div></div>
+    <div class="stat" style="border:1px solid #44DD8833;"><span class="stat-icon">✅</span><div><div class="stat-val" style="color:#44DD88;">${avail}</div><div class="stat-lbl">متاح للبيع</div></div></div>
+    <div class="stat" style="border:1px solid #FF8C0033;"><span class="stat-icon">⏸️</span><div><div class="stat-val" style="color:#FF8C00;">${off}</div><div class="stat-lbl">موقوف</div></div></div>`;
+}
+
+function filterProducts(q) { renderProducts(allProducts.filter(p=>(p.name||'').includes(q)||(p.desc||'').includes(q))); }
+
+function renderProducts(list) {
+  const el=document.getElementById('productsList');
+  if(!list.length){el.innerHTML=`<div class="empty"><span>📦</span>لا توجد منتجات — ابدأ بإضافة أول منتج!</div>`;return;}
+  el.innerHTML=list.map(p=>{
+    const badge=p.badge&&p.badge!=='none';
+    const bc=BADGE_COLORS[p.badge]||'#999';
+    const thumb=p.img?`<div class="pthumb"><img src="${p.img}" alt="${p.name}"></div>`:`<div class="pthumb">🎁</div>`;
+    return `<div class="prow${p.available===false?' off':''}">
+      ${thumb}
+      <div class="pinfo">
+        <div class="pname">${p.name}${badge?`<span class="badge-p" style="background:${bc};margin-right:6px;">${p.badgeText||''}</span>`:''}${p.available===false?`<span class="badge-p" style="background:#444;">⏸️ موقوف</span>`:''}</div>
+        <div class="pdesc">${p.desc||''}</div>
+        <div class="pmeta">
+          <span class="pprice">${p.price} جنيه</span>
+          ${p.oldPrice?`<span style="color:rgba(255,255,255,.3);font-size:.78rem;text-decoration:line-through;">${p.oldPrice} جنيه</span>`:''}
+          <span class="page">👶 ${p.age||''}</span>
+          <span class="pstars">${'★'.repeat(p.stars||5)}${'☆'.repeat(5-(p.stars||5))}</span>
+        </div>
+      </div>
+      <div class="pactions">
+        <button class="btn btn-b" onclick="openEditModal('${p._key}')">✏️ تعديل</button>
+        <button class="btn btn-g2" onclick="toggleProdAvail('${p._key}',${p.available!==false})">${p.available===false?'▶️ تفعيل':'⏸️ إيقاف'}</button>
+        <button class="btn btn-r" onclick="confirmDelete('${p._key}')">🗑️</button>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+async function toggleProdAvail(key,current) {
+  try {
+    await fbUpdate(`products/${key}`,{available:!current});
+    allProducts=allProducts.map(p=>p._key===key?{...p,available:!current}:p);
+    renderProducts(allProducts); updateStats();
+    showToast(current?'⏸️ تم الإيقاف':'▶️ تم التفعيل');
+  } catch { showToast("❌ فشل التحديث","err"); }
+}
+
+let deleteKey=null;
+function confirmDelete(key) {
+  deleteKey=key;
+  document.getElementById('confirmDeleteBtn').onclick=async()=>{
+    try {
+      await fbDelete(`products/${deleteKey}`);
+      allProducts=allProducts.filter(p=>p._key!==deleteKey);
+      renderProducts(allProducts); updateStats();
+      closeModal('deleteModal'); showToast("🗑️ تم الحذف");
+    } catch { showToast("❌ فشل الحذف","err"); }
+  };
+  openModal('deleteModal');
+}
+
+// ── PRODUCT MODAL ──
+function openAddModal() {
+  editingKey=null; modalImg=""; modalStars=5; modalBadge="new"; modalAvail=true;
+  document.getElementById('modalTitle').textContent='➕ إضافة منتج جديد';
+  clearModalFields(); pickStar(5);
+  pickBadge(document.querySelector('.badge-opt[data-v="new"]'));
+  setAvailToggle(true); openModal('productModal');
+}
+
+function openEditModal(key) {
+  const p=allProducts.find(x=>x._key===key); if(!p) return;
+  editingKey=key; modalImg=p.img||""; modalStars=p.stars||5; modalBadge=p.badge||"none"; modalAvail=p.available!==false;
+  document.getElementById('modalTitle').textContent='✏️ تعديل المنتج';
+  document.getElementById('mName').value=p.name||'';
+  document.getElementById('mDesc').value=p.desc||'';
+  document.getElementById('mPrice').value=p.price||'';
+  document.getElementById('mOldPrice').value=p.oldPrice||'';
+  document.getElementById('mAge').value=p.age||'';
+  document.getElementById('mBadgeText').value=p.badgeText||'';
+  setImgPreview(p.img||''); pickStar(p.stars||5);
+  const badgeBtn=document.querySelector(`.badge-opt[data-v="${p.badge||'none'}"]`);
+  if(badgeBtn) pickBadge(badgeBtn);
+  setAvailToggle(p.available!==false); openModal('productModal');
+}
+
+function clearModalFields() {
+  ['mName','mDesc','mPrice','mOldPrice','mAge','mBadgeText'].forEach(id=>document.getElementById(id).value='');
+  setImgPreview('');
+}
+
+async function saveProduct() {
+  const name=document.getElementById('mName').value.trim();
+  const price=parseFloat(document.getElementById('mPrice').value);
+  if(!name){alert('⚠️ اسم المنتج مطلوب');return;}
+  if(!price){alert('⚠️ السعر مطلوب');return;}
+  const data={name,desc:document.getElementById('mDesc').value.trim(),price,
+    oldPrice:parseFloat(document.getElementById('mOldPrice').value)||null,
+    age:document.getElementById('mAge').value.trim(),img:modalImg,stars:modalStars,
+    badge:modalBadge,badgeText:document.getElementById('mBadgeText').value.trim(),available:modalAvail};
+  try {
+    if(editingKey){
+      await fbUpdate(`products/${editingKey}`,data);
+      allProducts=allProducts.map(p=>p._key===editingKey?{...data,_key:editingKey}:p);
+      showToast("✅ تم حفظ التعديلات!");
+    } else {
+      const res=await fbPush("products",data);
+      allProducts.push({...data,_key:res.name});
+      showToast("🎉 تم إضافة المنتج!");
+    }
+    renderProducts(allProducts); updateStats(); closeModal('productModal');
+  } catch(e) { showToast("❌ فشل الحفظ — تأكد من Firebase Rules","err"); }
+}
+
+// ── IMAGE ──
+function handleImgFile(file) {
+  if(!file||!file.type.startsWith('image/')) return;
+  const r=new FileReader();
+  r.onload=e=>{modalImg=e.target.result;setImgPreview(e.target.result);};
+  r.readAsDataURL(file);
+}
+function handleImgDrop(e){e.preventDefault();document.getElementById('imgDrop').classList.remove('drag');handleImgFile(e.dataTransfer.files[0]);}
+function setImgPreview(url){
+  const drop=document.getElementById('imgDrop');
+  const rmBtn=document.getElementById('removeImgBtn');
+  if(url){drop.innerHTML=`<img src="${url}" alt="preview">`;rmBtn.style.display='block';}
+  else{drop.innerHTML=`<span style="font-size:2.3rem;">📸</span><span class="img-drop-text">اسحب صورة هنا أو اضغط للرفع</span><span style="color:rgba(255,255,255,.25);font-size:.72rem;">PNG • JPG • WEBP</span>`;rmBtn.style.display='none';}
+}
+function removeImg(){modalImg='';setImgPreview('');}
+
+// ── STAR / BADGE / TOGGLE ──
+function pickStar(n){modalStars=n;document.querySelectorAll('.sp').forEach(b=>b.classList.toggle('on',parseInt(b.dataset.v)<=n));}
+function pickBadge(btn){
+  modalBadge=btn.dataset.v;
+  document.querySelectorAll('.badge-opt').forEach(b=>{
+    const bc=BADGE_COLORS[b.dataset.v]||'#555';
+    b.style.background=b===btn?bc:'rgba(255,255,255,.07)';
+    b.style.borderColor=b===btn?bc:'rgba(255,255,255,.12)';
+  });
+  document.getElementById('mBadgeText').style.display=modalBadge==='none'?'none':'block';
+}
+function setAvailToggle(val){
+  modalAvail=val;
+  const tog=document.getElementById('availToggle');
+  const thumb=document.getElementById('availThumb');
+  const lbl=document.getElementById('availLabel');
+  tog.style.background=val?'var(--g)':'rgba(255,255,255,.15)';
+  thumb.style.right=val?'3px':'calc(100% - 21px)';
+  lbl.style.color=val?'var(--g)':'rgba(255,255,255,.35)';
+  lbl.textContent=val?'متاح':'موقوف';
+}
+function toggleAvailModal(){setAvailToggle(!modalAvail);}
+
+// ── ORDERS ──
+async function loadOrders() {
+  try {
+    const orders=await fbGet("orders");
+    const sorted=orders.sort((a,b)=>(b.ts||0)-(a.ts||0));
+    document.getElementById('ordersCount').textContent=`${orders.length} طلب`;
+    const el=document.getElementById('ordersList');
+    if(!sorted.length){el.innerHTML=`<div class="empty"><span>📦</span>لا توجد طلبات بعد</div>`;return;}
+    el.innerHTML=sorted.map(o=>{
+      const isConfirmed=o.status==='confirmed';
+      return `
+        <div class="order-card${isConfirmed?' confirmed':''}" id="ocard-${o._key}">
+          <div class="order-top">
+            <div>
+              <div class="order-id">#${o.orderId||o._key}</div>
+              <div class="order-date">${o.date||''}</div>
+            </div>
+            <span class="order-status ${isConfirmed?'status-confirmed':'status-new'}" id="ostatus-${o._key}">
+              ${isConfirmed?'🟠 تم التأكيد':'🆕 جديد'}
+            </span>
+          </div>
+          <div class="order-product">🧸 ${o.product||''} × ${o.qty||1}</div>
+          <div class="order-total">💰 ${o.total||o.price} جنيه</div>
+          <div class="order-info">
+            👤 ${o.name||''} &nbsp;|&nbsp; 📱 ${o.phone||''}
+            ${o.email?'&nbsp;|&nbsp; 📧 '+o.email:''}
+          </div>
+          <div class="order-addr">
+            📍 ${[o.city,o.district,o.street,o.building,o.apt].filter(Boolean).join(' - ')}
+            ${o.landmark?'<br>📌 '+o.landmark:''}
+            ${o.notes?'<br>📝 '+o.notes:''}
+          </div>
+          <div class="order-actions">
+            <button class="btn btn-orange" id="obtn-confirm-${o._key}"
+              onclick="confirmOrder('${o._key}')"
+              ${isConfirmed?'disabled style="opacity:.45;cursor:default;"':''}>
+              📋 تم التأكيد
+            </button>
+            <button class="btn btn-green" onclick="promptDeliver('${o._key}')">
+              🚚 تم الاستلام
+            </button>
+          </div>
+        </div>`;
+    }).join('');
+  } catch(e) {
+    document.getElementById('ordersList').innerHTML=`<div class="empty"><span>⚠️</span>فشل تحميل الطلبات</div>`;
+  }
+}
+
+// تأكيد الطلب — يغير الـ status فقط
+async function confirmOrder(key) {
+  const btn=document.getElementById(`obtn-confirm-${key}`);
+  if(btn&&btn.disabled) return;
+  try {
+    await fbUpdate(`orders/${key}`,{status:'confirmed'});
+    // تحديث الـ UI مباشرة بدون reload
+    const card=document.getElementById(`ocard-${key}`);
+    const statusEl=document.getElementById(`ostatus-${key}`);
+    if(card){card.classList.add('confirmed');}
+    if(statusEl){statusEl.className='order-status status-confirmed';statusEl.textContent='🟠 تم التأكيد';}
+    if(btn){btn.disabled=true;btn.style.opacity='.45';btn.style.cursor='default';}
+    showToast('📋 تم تأكيد الطلب — جاهز للتجهيز!');
+  } catch { showToast('❌ فشل التأكيد','err'); }
+}
+
+// تسليم الطلب — popup تأكيد ثم حذف
+let deliverKey=null;
+function promptDeliver(key) {
+  deliverKey=key;
+  document.getElementById('confirmDeliverBtn').onclick=async()=>{
+    try {
+      await fbDelete(`orders/${deliverKey}`);
+      const card=document.getElementById(`ocard-${deliverKey}`);
+      if(card){
+        card.style.transition='all .35s';
+        card.style.opacity='0';
+        card.style.transform='translateX(40px)';
+        setTimeout(()=>card.remove(),350);
+      }
+      closeModal('deliverModal');
+      showToast('✅ تم التسليم وحذف الطلب!');
+      // تحديث العداد
+      setTimeout(async()=>{
+        const orders=await fbGet("orders");
+        document.getElementById('ordersCount').textContent=`${orders.length} طلب`;
+      },400);
+    } catch { showToast('❌ فشل الحذف','err'); }
+  };
+  openModal('deliverModal');
+}
+
+// ── REVIEWS ──
+async function loadReviews() {
+  try {
+    const reviews=await fbGet("reviews");
+    const sorted=reviews.sort((a,b)=>(b.ts||0)-(a.ts||0));
+    const el=document.getElementById('reviewsList2');
+    if(!sorted.length){el.innerHTML=`<div class="empty"><span>💬</span>لا توجد تقييمات بعد</div>`;return;}
+    el.innerHTML=sorted.map(r=>`
+      <div class="order-card">
+        <div class="order-top">
+          <div>
+            <div style="font-weight:800;color:white;">${r.name||'مجهول'}</div>
+            <div style="color:rgba(255,255,255,.35);font-size:.75rem;">${r.product||''} | ${r.ts?new Date(r.ts).toLocaleDateString('ar-EG'):''}</div>
+          </div>
+          <div style="display:flex;align-items:center;gap:10px;">
+            <span style="color:var(--y);font-size:.9rem;">${'★'.repeat(r.stars||5)}${'☆'.repeat(5-(r.stars||5))}</span>
+            <button class="btn btn-r" style="padding:4px 10px;font-size:.75rem;" onclick="deleteReview('${r._key}')">🗑️</button>
+          </div>
+        </div>
+        <div style="color:rgba(255,255,255,.6);font-size:.88rem;line-height:1.7;">${r.text||''}</div>
+      </div>`).join('');
+  } catch { document.getElementById('reviewsList2').innerHTML=`<div class="empty"><span>⚠️</span>فشل التحميل</div>`; }
+}
+
+async function deleteReview(key) {
+  if(!confirm('تأكيد حذف التقييم؟')) return;
+  await fbDelete(`reviews/${key}`);
+  showToast("🗑️ تم حذف التقييم"); loadReviews();
+}
+
+// ── MODALS ──
+function openModal(id){document.getElementById(id).classList.add('open');}
+function closeModal(id){document.getElementById(id).classList.remove('open');}
+document.querySelectorAll('.overlay').forEach(o=>{
+  o.addEventListener('click',e=>{if(e.target===o)o.classList.remove('open');});
+});
+
+// ── TOAST ──
+let toastTimer;
+function showToast(msg,type='ok'){
+  const t=document.getElementById('toast');
+  t.textContent=msg;
+  t.style.background=type==='ok'?'linear-gradient(135deg,#44DD88,#00AA55)':'linear-gradient(135deg,#FF4444,#CC0000)';
+  t.classList.add('show'); clearTimeout(toastTimer);
+  toastTimer=setTimeout(()=>t.classList.remove('show'),2800);
+}
+
+if(sessionStorage.getItem('tb_admin')) init();
+</script>
+</body>
+</html>
